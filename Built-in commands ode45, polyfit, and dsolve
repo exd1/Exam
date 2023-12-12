@@ -1,0 +1,56 @@
+
+f=@(t,y) [y(2);2*y(2)-y(1)-2];
+y0=[1;1];
+[ts,ys]=ode45(f,[0,1],y0);
+plot(ts,ys(:,1),'*','LineWidth',2)
+grid on
+
+y0=1;
+xspan=[-1,1];
+f=@(x,y) y+x;
+[x,y]=ode45(f,xspan,y0);
+plot(x,y,'+','LineWidth',2)
+
+Degree 1
+x=[1 2 3 4 5];
+y=[1.1 2.3 5.6 6.9 7.5];
+p=polyfit(x,y,1);
+f=@(x) p(1)*x+p(2);
+plot(x,y,'*',x,f(x),'r')
+
+Quadratic
+x=[1 2 3 4 5];
+y=[1.1 2.3 5.6 6.9 7.5];
+p=polyfit(x,y,2)
+f=@(x) p(1)*x.^2+p(2)*x+p(3);
+plot(x,y,'*',x,f(x),'r')
+
+dsolve('Dy=y-sin(x)+x^2','y(0)=1','x')
+Heat Implicit
+function[u] = heat_implicit(t0, tn, x0, xn, h, k, c)
+I = round((xn-x0)/h);
+J = round((tn - t0)/k);
+r = c*k/h^2;
+f = @ (x) x.*(1-x);
+x = x0:h:xn;
+t = t0:k:tn;
+u = zeros(I+1, J+1);
+u(:,1) = f(x);
+u(1, :) = 0;
+u(I+1, :) = 0;
+A = diag((1+2*r)*ones(I-1,1))-r*diag(ones(I-2,1), -1)-r*diag(ones(I-2,1),1);
+b = zeros(I-1,1);
+for j=2:J+1
+ b(1,1) = u(2,j-1)+r*u(1,j);
+ b(2:I-2,1) = u(3:I-1,j-1);
+ b(I-1,1) = u(I, j-1)+r*u(I+1,j);
+ u(2:I,j) = A\b;
+end
+figure(1)
+surf(x,t,u');
+xlabel('x')
+ylabel('y')
+zlabel('u')
+title('Numerical solution of 1D heat equation')
+end
+>> heat_implicit(0,0.5,0,1,0.1,0.01,1)
